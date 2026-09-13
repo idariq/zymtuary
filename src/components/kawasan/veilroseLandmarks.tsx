@@ -1,8 +1,9 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { VEILROSE_PALETTE } from './veilrosePalette';
 import { terrainParams, type IslandTerrainOptions } from '../wilayah/wilayahTerrain';
+import { createOrganicBlob } from './organicGeometry';
 
 /**
  * Setiap bentuk di sini direka terus daripada spot_utama Veilrose Quarter
@@ -439,6 +440,11 @@ function RoomOfFallenPetalsLandmark() {
 		{ x: 0.7, z: -0.15, rot: -0.8 },
 		{ x: -0.2, z: 0.55, rot: 1.2 },
 	];
+	const wiltedBloomGeometries = useMemo(
+		() => wiltedClusters.map((_, i) => createOrganicBlob({ radius: 0.11, detail: 1, amplitude: 0.32, seed: i * 5.3 + 1 })),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[],
+	);
 
 	return (
 		<group>
@@ -475,8 +481,7 @@ function RoomOfFallenPetalsLandmark() {
 						<cylinderGeometry args={[0.02, 0.025, 0.2, 5]} />
 						<meshStandardMaterial color="#6b5a42" flatShading roughness={0.85} />
 					</mesh>
-					<mesh position={[0, 0.19, 0]}>
-						<icosahedronGeometry args={[0.11, 0]} />
+					<mesh geometry={wiltedBloomGeometries[i]} position={[0, 0.19, 0]}>
 						<meshStandardMaterial color={VEILROSE_PALETTE.driedRose} flatShading roughness={0.75} />
 					</mesh>
 				</group>
@@ -533,6 +538,11 @@ const SWAY_PERIOD = 5;
  * "bernafas", bukan statik sepenuhnya. */
 export function RoseStallProp({ scale, swayPhase = 0 }: { scale: number; swayPhase?: number }) {
 	const clusterRef = useRef<THREE.Group>(null);
+	const bloomGeometries = useMemo(
+		() => [0, 1, 2].map((i) => createOrganicBlob({ radius: 0.19, detail: 1, amplitude: 0.34, seed: swayPhase * 2 + i * 7.1 })),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[swayPhase],
+	);
 	useFrame(({ clock }) => {
 		if (!clusterRef.current) return;
 		const t = clock.getElapsedTime();
@@ -560,8 +570,11 @@ export function RoseStallProp({ scale, swayPhase = 0 }: { scale: number; swayPha
 				{[0, 1, 2].map((i) => {
 					const color = BLOOM_COLORS[i % BLOOM_COLORS.length];
 					return (
-						<mesh key={i} position={[Math.cos((i / 3) * Math.PI * 2) * 0.16, 0, Math.sin((i / 3) * Math.PI * 2) * 0.16]}>
-							<icosahedronGeometry args={[0.19, 0]} />
+						<mesh
+							key={i}
+							geometry={bloomGeometries[i]}
+							position={[Math.cos((i / 3) * Math.PI * 2) * 0.16, 0, Math.sin((i / 3) * Math.PI * 2) * 0.16]}
+						>
 							<meshStandardMaterial color={color} flatShading emissive={color} emissiveIntensity={0.22} roughness={0.55} />
 						</mesh>
 					);

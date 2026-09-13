@@ -23,6 +23,7 @@ import { RoseStallProp } from './veilroseLandmarks';
 import { VeilroseGrassTuft, VeilroseFloweringTree, VeilroseAlleyFlagLine, VeilroseAlleyCornerDecor } from './veilroseDecor';
 import { VEILROSE_PALETTE } from './veilrosePalette';
 import { ZymCharacterController, type ZymJoystickVisual } from './ZymCharacterController';
+import { VeilroseAutoShadows, VeilroseDitherFX } from './veilroseStyleFX';
 
 const BASE_GROUND_COLOR = VEILROSE_PALETTE.gold;
 const ZYM_GLOW_COLOR = '#d4a843';
@@ -73,8 +74,23 @@ export function VeilroseQuarterScene({
 		<>
 			<fog attach="fog" args={[BASE_GROUND_COLOR, 10, 42]} />
 			<hemisphereLight args={['#fbe2a8', '#5a3d2a', 0.85]} />
-			<directionalLight position={[-4, 3.5, 2]} intensity={1.3} color="#ffd9a0" />
+			<directionalLight
+				position={[-4, 3.5, 2]}
+				intensity={1.3}
+				color="#ffd9a0"
+				castShadow={!isMobile}
+				shadow-mapSize={[1024, 1024]}
+				shadow-camera-left={-20}
+				shadow-camera-right={20}
+				shadow-camera-top={20}
+				shadow-camera-bottom={-20}
+				shadow-camera-near={0.5}
+				shadow-camera-far={40}
+				shadow-bias={-0.0015}
+			/>
 			<ambientLight intensity={0.25} color={BASE_GROUND_COLOR} />
+			{!isMobile ? <VeilroseAutoShadows /> : null}
+			<VeilroseDitherFX />
 
 			<VeilroseCitySilhouettes />
 
@@ -110,7 +126,7 @@ export function VeilroseQuarterScene({
 			</group>
 
 			<group ref={collisionRootRef}>
-				<mesh geometry={geometry} receiveShadow={false}>
+				<mesh geometry={geometry} receiveShadow={!isMobile}>
 					<meshStandardMaterial vertexColors roughness={0.85} metalness={0.02} />
 				</mesh>
 

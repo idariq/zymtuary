@@ -81,6 +81,7 @@ export default function VeilroseQuarterWorld({ entity }: { entity: EntityData })
 						}}
 						dpr={isMobile ? [1, 1.75] : [1, 2]}
 						gl={{ antialias: !isMobile, alpha: true, powerPreference: 'high-performance' }}
+						shadows={!isMobile}
 						style={{ touchAction: 'none' }}
 						onCreated={handleCanvasCreated}
 					>
