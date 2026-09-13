@@ -1,7 +1,8 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { VEILROSE_PALETTE } from './veilrosePalette';
+import { createOrganicBlob } from './organicGeometry';
 
 const FLAG_COLORS = [VEILROSE_PALETTE.pink, VEILROSE_PALETTE.purple, VEILROSE_PALETTE.gold];
 
@@ -73,14 +74,14 @@ export function VeilroseAlleyCornerDecor({
 		);
 	}
 	if (kind === 'pot') {
+		const bloomGeometry = createOrganicBlob({ radius: 0.14, detail: 1, amplitude: 0.28, seed: 4.2 });
 		return (
 			<group>
 				<mesh position={[0, 0.18, 0]}>
 					<cylinderGeometry args={[0.22, 0.26, 0.36, 8]} />
 					<meshStandardMaterial color="#8a5a42" flatShading roughness={0.8} />
 				</mesh>
-				<mesh position={[0, 0.42, 0]}>
-					<icosahedronGeometry args={[0.14, 0]} />
+				<mesh geometry={bloomGeometry} position={[0, 0.42, 0]}>
 					<meshStandardMaterial color={VEILROSE_PALETTE.pink} flatShading emissive={VEILROSE_PALETTE.pink} emissiveIntensity={0.2} />
 				</mesh>
 			</group>
@@ -125,6 +126,7 @@ const GRASS_SWAY_PERIOD = 3.4;
 export function VeilroseGrassTuft({ scale, swayPhase = 0 }: { scale: number; swayPhase?: number }) {
 	const groupRef = useRef<THREE.Group>(null);
 	const hasBloom = swayPhase % 1 < 0.4;
+	const bloomGeometry = useMemo(() => createOrganicBlob({ radius: 0.06, detail: 0, amplitude: 0.3, seed: swayPhase }), [swayPhase]);
 
 	useFrame(({ clock }) => {
 		if (!groupRef.current) return;
@@ -150,8 +152,7 @@ export function VeilroseGrassTuft({ scale, swayPhase = 0 }: { scale: number; swa
 				);
 			})}
 			{hasBloom ? (
-				<mesh position={[0, 0.24, 0]}>
-					<icosahedronGeometry args={[0.06, 0]} />
+				<mesh geometry={bloomGeometry} position={[0, 0.24, 0]}>
 					<meshStandardMaterial
 						color={GRASS_BLOOM_COLORS[Math.floor(swayPhase) % GRASS_BLOOM_COLORS.length]}
 						flatShading
@@ -191,6 +192,26 @@ export function VeilroseFloweringTree({ scale, swayPhase = 0 }: { scale: number;
 		{ y: 2.5, r: 0.3 },
 	];
 
+	// Kanopi organik (bukan dodecahedron licin) — permukaan diherot noise
+	// supaya terasa spt gumpalan daun/bunga semula jadi (rujuk gaya diorama
+	// low-poly yg diminta pengguna), squashY sikit < 1 supaya kanopi
+	// melebar-mendatar spt pokok sebenar, bukan bulat sempurna.
+	const tierGeometries = useMemo(
+		() =>
+			tiers.map((tier, i) =>
+				createOrganicBlob({
+					radius: tier.r,
+					detail: 1,
+					amplitude: 0.3,
+					frequency: 2.6,
+					squashY: 0.82,
+					seed: swayPhase * 3 + i * 11,
+				}),
+			),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[swayPhase],
+	);
+
 	return (
 		<group scale={scale}>
 			<mesh position={[0, 0.85, 0]}>
@@ -199,8 +220,7 @@ export function VeilroseFloweringTree({ scale, swayPhase = 0 }: { scale: number;
 			</mesh>
 			<group ref={canopyRef}>
 				{tiers.map((tier, i) => (
-					<mesh key={i} position={[0, tier.y, 0]}>
-						<dodecahedronGeometry args={[tier.r, 0]} />
+					<mesh key={i} geometry={tierGeometries[i]} position={[0, tier.y, 0]}>
 						<meshStandardMaterial
 							color={blooms[i % blooms.length]}
 							flatShading
