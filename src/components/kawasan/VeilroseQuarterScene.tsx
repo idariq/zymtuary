@@ -111,7 +111,7 @@ export function VeilroseQuarterScene({
 
 			<group ref={collisionRootRef}>
 				<mesh geometry={geometry} receiveShadow={false}>
-					<meshStandardMaterial vertexColors flatShading roughness={0.85} metalness={0.02} />
+					<meshStandardMaterial vertexColors roughness={0.85} metalness={0.02} />
 				</mesh>
 
 				<VeilrosePerimeterBuildings />

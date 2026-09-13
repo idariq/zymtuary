@@ -195,7 +195,6 @@ export default function AethirionIsland({ atmosphereBlendRef }: AethirionIslandP
 		() =>
 			new THREE.MeshStandardMaterial({
 				color: '#8a7a62',
-				flatShading: true,
 				roughness: 0.88,
 				metalness: 0.03,
 				transparent: true,
