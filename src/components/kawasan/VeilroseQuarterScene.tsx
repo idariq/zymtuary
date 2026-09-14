@@ -23,7 +23,7 @@ import { RoseStallProp } from './veilroseLandmarks';
 import { VeilroseGrassTuft, VeilroseFloweringTree, VeilroseAlleyFlagLine, VeilroseAlleyCornerDecor } from './veilroseDecor';
 import { VEILROSE_PALETTE } from './veilrosePalette';
 import { ZymCharacterController, type ZymJoystickVisual } from './ZymCharacterController';
-import { VeilroseAutoShadows, VeilroseDitherFX } from './veilroseStyleFX';
+import { VeilroseAutoShadows } from './veilroseStyleFX';
 
 const BASE_GROUND_COLOR = VEILROSE_PALETTE.gold;
 const ZYM_GLOW_COLOR = '#d4a843';
@@ -90,7 +90,6 @@ export function VeilroseQuarterScene({
 			/>
 			<ambientLight intensity={0.25} color={BASE_GROUND_COLOR} />
 			{!isMobile ? <VeilroseAutoShadows /> : null}
-			<VeilroseDitherFX />
 
 			<VeilroseCitySilhouettes />
 
